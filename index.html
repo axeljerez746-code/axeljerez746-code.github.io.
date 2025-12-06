@@ -13,8 +13,8 @@
             --dark-border: #3c3c6e; 
             --logo-color: #d1b4ff; 
             --rank-gold: #ffc107; 
-            --rank-silver: #a0a0a0;
-            --rank-bronze: #cd7f32;
+            --rank-silver: #a0a0a0; 
+            --rank-bronze: #cd7f32; 
             --tier-high-color-bg: #b03a8d; /* Morado/Rojo Oscuro para HT */
             --tier-low-color-bg: #8e44ad;  /* Morado Intenso para LT */
             --tier-unranked-bg: #5a5a5a;   /* Gris Oscuro para UNRANKED */
@@ -603,8 +603,8 @@
     </div>
 
     <script>
-        // --- CONFIGURACIÓN DE DATOS Y LÓGICA DE TIERS (TIERS CORREGIDOS) ---
-        // Orden de peor (1) a mejor (10): LT5, HT5, LT4, HT4, LT3, HT3, LT2, HT2, LT1, HT1
+        // --- CONFIGURACIÓN DE DATOS Y LÓGICA DE TIERS ---
+        // Puntuación de peor (1) a mejor (10): LT5 -> HT1
         const TIER_RANKING = {
             'LT5': 1,
             'HT5': 2,
@@ -644,14 +644,12 @@
             const prefix = tier.substring(0, 2);
             if (prefix === 'HT') return 'tier-ht';
             if (prefix === 'LT') return 'tier-lt';
-            if (tier === 'UNRANKED') return 'tier-unranked'; // Clase para UNRANKED
+            if (tier === 'UNRANKED') return 'tier-unranked';
             return '';
         }
 
         /**
          * Encuentra el string del Tier de mayor rango del jugador.
-         * @param {string} tiersData - String de tiers (ej: "CristalPvP:HT3,Sword:LT3").
-         * @returns {string} El string del mejor Tier (ej: "HT3") o 'Default'.
          */
         function getSoloTier(tiersData) {
             const tiers = tiersData.split(',').map(entry => {
@@ -721,7 +719,7 @@
                 const tiers = tiersData.split(',');
                 for (const tierEntry of tiers) {
                     const [modeName, tier] = tierEntry.split(':');
-                    if (modeName === mode) {
+                    if (modeName === mode && getTierScore(tier) > 0) {
                         return getTierScore(tier);
                     }
                 }
@@ -763,13 +761,14 @@
                          tierToShow = getSoloTier(tiersData);
                      } else {
                          const modeEntry = tiersData.split(',').find(e => e.startsWith(selectedMode + ':'));
+                         // Aseguramos que solo mostramos el Tier si existe. Si no, se mostrará UNRANKED (ya cubierto por score === 0)
                          tierToShow = modeEntry ? modeEntry.split(':')[1] : 'Default';
                      }
                      soloTierDisplayDiv.appendChild(createSoloTierBadge(tierToShow));
                 }
             });
 
-            // 3. Custom Sorting (Peor Tier a Mejor Tier, UNRANKED al final)
+            // 3. Custom Sorting (Mejor Tier a Peor Tier, UNRANKED al final)
             activeRows.sort((a, b) => {
                 // Prioridad 1: Mover a los "Unranked" (score 0) al final.
                 // Si A es Unranked y B es Rankeado, A va ABAJO (1)
@@ -777,8 +776,9 @@
                 // Si B es Unranked y A es Rankeado, B va ABAJO (-1)
                 if (a.isRanked && !b.isRanked) return -1;
                 
-                // Prioridad 2: Ordenar Rankeados (o Unranked entre sí) por Score Ascendente (Peor a Mejor Tier)
-                return a.score - b.score; 
+                // Prioridad 2: Ordenar Rankeados por Score DESCENDENTE (Mejor Tier -> Peor Tier)
+                // Usamos b.score - a.score para el orden descendente
+                return b.score - a.score; 
             });
 
             // 4. Visualización y asignación de rangos
@@ -787,6 +787,9 @@
                 const row = item.element;
                 
                 let rankVisualElement = row.querySelector('.rank-number');
+                // En el modo Overall o en modo específico, el rango solo se aplica a los rankeados.
+                // Pero si el usuario quiere que el rank #8 sea el primer unranked, lo dejamos así.
+                
                 rankVisualElement.textContent = currentRank;
                 
                 row.classList.remove('rank-1', 'rank-2', 'rank-3');
