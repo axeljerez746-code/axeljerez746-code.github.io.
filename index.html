@@ -399,7 +399,7 @@
         <div class="nav-links">
             <a href="#">Home</a>
             <a href="#" id="rankings-link">Rankings (Mejor Nivel)</a>
-            <a href="https://ejemplo.com/discord-link" target="_blank" id="discord-link">Discord</a>
+            <a href="https://discord.gg/ZjRk3Apz" target="_blank" id="discord-link">Discord</a>
             <a href="#">Docs</a>
         </div>
         <div>
@@ -436,6 +436,16 @@
                     <div class="player-info" data-player="a2lqx">
                         <img src="https://cravatar.eu/helmavatar/a2lqx/36.png" alt="Skin Icon a2lqx" class="skin-icon">
                         <strong>a2lqx</strong>
+                    </div>
+                    <div>SA</div>
+                    <div class="tiers-list"></div>
+                </div>
+                
+                <div class="tier-row" data-name="SoyKaoss" data-skin-name="SoyKaoss" data-mode-tiers="CristalPvP:LT3,NetPot:LT4,Sword:LT4,SMP:LT5,UHC:LT5">
+                    <div class="rank-badge"><div class="rank-number"></div></div>
+                    <div class="player-info" data-player="SoyKaoss">
+                        <img src="https://cravatar.eu/helmavatar/SoyKaoss/36.png" alt="Skin Icon SoyKaoss" class="skin-icon">
+                        <strong>SoyKaoss</strong>
                     </div>
                     <div>SA</div>
                     <div class="tiers-list"></div>
@@ -560,6 +570,7 @@
         const profileOverallPoints = document.getElementById('profile-overall-points');
         const profileTiersContainer = document.getElementById('profile-tiers-container');
         const namemcLink = document.getElementById('namemc-link');
+        const rankingsLink = document.getElementById('rankings-link');
 
         function getTierScore(tierString) {
             return TIER_SCORES[tierString] || TIER_SCORES['NA'];
@@ -597,7 +608,9 @@
         function filterAndSort(selectedMode) {
             
             modeButtons.forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[data-mode="${selectedMode}"]`).classList.add('active');
+            const activeBtn = document.querySelector(`[data-mode="${selectedMode}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
             document.querySelector('h2').textContent = `SA | Tier List (${selectedMode})`;
 
             let activeRows = [];
@@ -608,32 +621,38 @@
                 
                 if (selectedMode === 'Overall') {
                     const overallData = getOverallData(tiersData);
-                    score = overallData.maxScore; // Score primario para Overall es el max tier score
+                    score = overallData.maxScore; // Score primario para Overall es el max tier score (HT3 > HT4)
                     totalScore = overallData.totalScore;
                 } else {
                     const modeEntry = tiersData.find(e => e.modeName === selectedMode);
                     score = modeEntry ? modeEntry.score : 0;
                 }
                 
-                row.classList.remove('hidden');
-                activeRows.push({ 
-                    element: row, 
-                    score: score,
-                    totalScore: totalScore,
-                    tiersData: tiersData // Guardar los datos completos para el modal
-                });
+                // Solo mostrar jugadores con score > 0 en el modo específico.
+                if (selectedMode !== 'Overall' && score === 0) {
+                     row.classList.add('hidden');
+                } else {
+                    row.classList.remove('hidden');
+                    activeRows.push({ 
+                        element: row, 
+                        score: score,
+                        totalScore: totalScore,
+                        tiersData: tiersData 
+                    });
+                }
                 
                 // Actualizar la lista de tiers en la fila
                 const tiersListDiv = row.querySelector('.tiers-list');
                 tiersListDiv.innerHTML = ''; 
                 
                 if (selectedMode !== 'Overall') {
+                    // Muestra solo el tier de la modalidad activa
                     const entry = tiersData.find(e => e.modeName === selectedMode);
                     if (entry && entry.tier !== 'NA' && entry.score > 0) {
                          tiersListDiv.appendChild(createTierBadge(entry.modeName, entry.tier, false));
                     }
                 } else {
-                    // Ordenar por score descendente y mostrar máximo 3 para 'Overall'
+                    // Muestra los 3 mejores tiers para 'Overall'
                     const relevantTiers = tiersData
                         .filter(e => e.score > 0)
                         .sort((a, b) => b.score - a.score)
@@ -648,11 +667,11 @@
             // Lógica de Ordenamiento
             activeRows.sort((a, b) => {
                 if (selectedMode === 'Overall') {
-                    // 1. Primario: Max Tier Score (Max Score)
+                    // 1. Primario: Max Tier Score 
                     if (b.score !== a.score) {
                         return b.score - a.score;
                     }
-                    // 2. Secundario: Total Score (Puntos totales)
+                    // 2. Secundario: Total Score (Desempate)
                     if (b.totalScore !== a.totalScore) {
                         return b.totalScore - a.totalScore;
                     }
@@ -698,7 +717,6 @@
             
             let iconHTML;
             if (modeName === 'CristalPvP' && iconData.isImage) {
-                // Usar imagen específica para CristalPvP (simulando el screenshot)
                 const imageUrl = "https://media.discordapp.net/attachments/1446883353256132810/1446911128704782580/brave_screenshot_mctiers.com_8.png?ex=6935b47f&is=693462ff&hm=ce559901d610546fd8d22824e1b7c82d888530ce9946df337cb636f2acc88855&format=webp&quality=lossless";
                  iconHTML = `<img src="${imageUrl}" alt="${modeName} Icon" class="cristal-pvp-img">`;
             } else {
@@ -723,27 +741,24 @@
             
             profileHead.src = `https://cravatar.eu/helmavatar/${skinName}/128.png`;
             profileName.textContent = playerName;
-            profileRegion.textContent = 'South America'; // Asumido
+            profileRegion.textContent = 'South America'; 
             
             profileOverallRank.textContent = `${overallRank}.`;
             profileOverallPoints.textContent = `(${overallData.totalScore} points)`;
             
-            // Llenar los tiers
             profileTiersContainer.innerHTML = '';
             
-            const allModes = Object.keys(MODE_ICONS);
+            const allModes = Object.keys(MODE_ICONS).filter(m => m !== 'Overall'); // Excluir Overall
             
-            allModes.forEach(modeName => {
-                const entry = tiers.find(t => t.modeName === modeName);
-                const tier = entry ? entry.tier : 'NA';
-                
-                // Mostrar solo tiers con score > 0
-                if (tier !== 'NA' && TIER_SCORES[tier] > 0) {
-                     profileTiersContainer.appendChild(createTierBadge(modeName, tier, true));
-                }
+            // Ordenar los tiers para el modal por score
+            const sortedTiers = tiers
+                .filter(t => TIER_SCORES[t.tier] > 0)
+                .sort((a, b) => b.score - a.score);
+
+            sortedTiers.forEach(entry => {
+                profileTiersContainer.appendChild(createTierBadge(entry.modeName, entry.tier, true));
             });
 
-            // Enlace NameMC
             namemcLink.href = `https://namemc.com/profile/${skinName}`;
             
             modal.style.display = 'flex';
@@ -766,6 +781,12 @@
                 const row = playerInfoDiv.closest('.tier-row');
                 openProfileModal(row);
             }
+        });
+
+        // Link de Rankings en Navbar
+        rankingsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            filterAndSort('Overall');
         });
 
         // Cerrar Modal
