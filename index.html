@@ -17,6 +17,7 @@
             --rank-bronze: #cd7f32;
             --tier-high-color-bg: #b03a8d; /* Morado/Rojo Oscuro para HT */
             --tier-low-color-bg: #8e44ad;  /* Morado Intenso para LT */
+            --tier-unranked-bg: #5a5a5a;   /* Gris Oscuro para UNRANKED */
             --tier-label-text: #fff;
             --icon-circle-border: #d1b4ff; 
             --active-mode-btn: #8e44ad; 
@@ -239,6 +240,11 @@
             background-color: var(--tier-low-color-bg); 
             color: var(--tier-label-text); 
         }  
+        /* Nuevo estilo para UNRANKED */
+        .tier-unranked .solo-tier-label { 
+            background-color: var(--tier-unranked-bg); 
+            color: var(--tier-label-text); 
+        }
 
         /* --- Estilos de Badge de Tier (para el modal) --- */
         .tier-item-badge {
@@ -553,6 +559,19 @@
                     <div class="solo-tier-display"></div>
                 </div>
                 
+                <div class="tier-row" data-player-name="NoTierPlayer" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=43a3d548324467c6&scale=6" data-points="100" data-rank-overall="0" data-mode-tiers="" data-region="NA">
+                    <div class="rank-badge"><div class="rank-number"></div></div>
+                    <div class="player-info">
+                        <div class="player-name-line">
+                            <img src="https://s.namemc.com/2d/skin/face.png?id=43a3d548324467c6&scale=6" alt="Skin Icon NoTierPlayer" class="skin-icon">
+                            <strong>NoTierPlayer</strong>
+                        </div>
+                        <div class="player-subtext">Combat Recruit (100 points)</div>
+                    </div>
+                    <div>NA</div>
+                    <div class="solo-tier-display"></div>
+                </div>
+                
             </div> 
         </div>
         
@@ -625,13 +644,14 @@
             const prefix = tier.substring(0, 2);
             if (prefix === 'HT') return 'tier-ht';
             if (prefix === 'LT') return 'tier-lt';
+            if (tier === 'UNRANKED') return 'tier-unranked'; // Clase para UNRANKED
             return '';
         }
 
         /**
          * Encuentra el string del Tier de mayor rango del jugador.
          * @param {string} tiersData - String de tiers (ej: "CristalPvP:HT3,Sword:LT3").
-         * @returns {string} El string del mejor Tier (ej: "HT3").
+         * @returns {string} El string del mejor Tier (ej: "HT3") o 'Default'.
          */
         function getSoloTier(tiersData) {
             const tiers = tiersData.split(',').map(entry => {
@@ -654,16 +674,17 @@
         }
 
         function createSoloTierBadge(tier) {
-            const tierClass = getTierClass(tier);
+            // Usamos 'UNRANKED' como etiqueta si el score es 0 o si es 'Default'
+            const displayTier = (getTierScore(tier) === 0 || tier === 'Default') ? 'UNRANKED' : tier;
+            const tierClass = getTierClass(displayTier); 
 
             const item = document.createElement('div');
             item.className = `solo-tier-badge ${tierClass}`;
             
-            item.innerHTML = `<span class="solo-tier-label tier-label">${tier}</span>`;
+            item.innerHTML = `<span class="solo-tier-label tier-label">${displayTier}</span>`;
             return item;
         }
         
-        // Función para crear el badge COMPLETO de tier (usado en el modal)
         function createTierBadge(modeName, tier) {
             const iconData = MODE_ICONS[modeName] || { icon: '❓', class: '' };
             const tierClass = getTierClass(tier);
@@ -693,18 +714,18 @@
 
         function getPlayerScoreInMode(row, mode) {
             const tiersData = row.getAttribute('data-mode-tiers');
-            const tiers = tiersData.split(',');
             
             if (mode === 'Overall') {
                 return getTierScore(getSoloTier(tiersData));
             } else {
+                const tiers = tiersData.split(',');
                 for (const tierEntry of tiers) {
                     const [modeName, tier] = tierEntry.split(':');
                     if (modeName === mode) {
                         return getTierScore(tier);
                     }
                 }
-                return 0;
+                return 0; // Score 0 si es Unranked en este modo
             }
         }
 
@@ -721,46 +742,46 @@
             document.querySelectorAll('.tier-row').forEach(row => {
                 const tiersData = row.getAttribute('data-mode-tiers');
                 const score = getPlayerScoreInMode(row, selectedMode);
-                // Si el score es > 0 (porque Default/Overall son 0), es relevante.
-                const isRelevant = score > 0; 
-
-                if (isRelevant) {
-                    row.classList.remove('hidden');
-                    activeRows.push({
-                        element: row,
-                        score: score
-                    });
-                } else {
-                    row.classList.add('hidden');
-                }
                 
-                // --- Actualización del Solo Tier en la Fila ---
+                // 1. Preparamos el elemento para la lista de ordenamiento
+                activeRows.push({
+                    element: row,
+                    score: score,
+                    isRanked: score > 0
+                });
+                
+                // 2. Determinamos qué Tier mostrar en la tabla (Solo Tier Display)
                 const soloTierDisplayDiv = row.querySelector('.solo-tier-display');
                 soloTierDisplayDiv.innerHTML = '';
                 
-                let tierToShow = getSoloTier(tiersData);
-                
-                if (selectedMode !== 'Overall') {
-                    const modeEntry = tiersData.split(',').find(e => e.startsWith(selectedMode + ':'));
-                    if (modeEntry) {
-                        const [, tier] = modeEntry.split(':');
-                        if (getTierScore(tier) > 0) {
-                            tierToShow = tier;
-                        }
-                    } else {
-                        tierToShow = 'Default';
-                    }
-                }
-                
-                if (getTierScore(tierToShow) > 0) { 
+                if (score === 0) {
+                     soloTierDisplayDiv.appendChild(createSoloTierBadge('UNRANKED'));
+                } else {
+                     // Determinar el Tier a mostrar: Mejor Tier (Overall) o Tier específico del modo
+                     let tierToShow;
+                     if (selectedMode === 'Overall') {
+                         tierToShow = getSoloTier(tiersData);
+                     } else {
+                         const modeEntry = tiersData.split(',').find(e => e.startsWith(selectedMode + ':'));
+                         tierToShow = modeEntry ? modeEntry.split(':')[1] : 'Default';
+                     }
                      soloTierDisplayDiv.appendChild(createSoloTierBadge(tierToShow));
                 }
             });
 
-            // Ordenamiento: El score más alto va primero (descendente)
-            activeRows.sort((a, b) => b.score - a.score);
+            // 3. Custom Sorting (Peor Tier a Mejor Tier, UNRANKED al final)
+            activeRows.sort((a, b) => {
+                // Prioridad 1: Mover a los "Unranked" (score 0) al final.
+                // Si A es Unranked y B es Rankeado, A va ABAJO (1)
+                if (!a.isRanked && b.isRanked) return 1; 
+                // Si B es Unranked y A es Rankeado, B va ABAJO (-1)
+                if (a.isRanked && !b.isRanked) return -1;
+                
+                // Prioridad 2: Ordenar Rankeados (o Unranked entre sí) por Score Ascendente (Peor a Mejor Tier)
+                return a.score - b.score; 
+            });
 
-            // Visualización y asignación de rangos
+            // 4. Visualización y asignación de rangos
             let currentRank = 1;
             activeRows.forEach(item => {
                 const row = item.element;
@@ -825,18 +846,25 @@
                     modalTiersList.innerHTML = '';
                     
                     const tiers = tiersData.split(',').map(entry => {
-                        const [modeName, tier] = entry.split(':');
-                        return { modeName, tier: tier || 'Default', score: getTierScore(tier) };
+                        const parts = entry.split(':');
+                        const modeName = parts[0];
+                        const tier = parts.length > 1 ? parts[1] : 'Default';
+                        return { modeName, tier, score: getTierScore(tier) };
                     });
                     
-                    // Filtrar los Tiers relevantes y ordenar por score (el mejor primero)
+                    // Filtrar los Tiers relevantes (score > 0) y ordenar por score DESCENDENTE (Mejor a Peor)
                     const relevantTiers = tiers
                         .filter(e => e.score > 0)
                         .sort((a, b) => b.score - a.score); 
 
-                    relevantTiers.forEach(entry => {
-                        modalTiersList.appendChild(createTierBadge(entry.modeName, entry.tier));
-                    });
+                    if (relevantTiers.length === 0) {
+                        // Si el jugador no tiene ningún Tier
+                        modalTiersList.innerHTML = `<div style="font-style: italic; color: #888;">Este jugador no tiene ningún Tier asignado.</div>`;
+                    } else {
+                        relevantTiers.forEach(entry => {
+                            modalTiersList.appendChild(createTierBadge(entry.modeName, entry.tier));
+                        });
+                    }
                     
                     document.getElementById('playerModal').style.display = 'flex';
                 });
