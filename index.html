@@ -7,11 +7,11 @@
     <style>
         /* Variables y Estilos Generales (Fancy Dark Theme) */
         :root {
-            --bg-color: #0c0c16; /* Fondo Muy Oscuro */
+            --bg-color: #0c0c16; 
             --main-text-color: #f0f0f0;
-            --dark-panel-bg: #1e1e3f; /* Morado/Azul Oscuro para paneles */
-            --dark-border: #3c3c6e; /* Borde de separación elegante */
-            --logo-color: #d1b4ff; /* Morado Claro/Lila para el logo y acentos */
+            --dark-panel-bg: #1e1e3f; 
+            --dark-border: #3c3c6e; 
+            --logo-color: #d1b4ff; 
             --rank-gold: #ffc107; 
             --rank-silver: #a0a0a0;
             --rank-bronze: #cd7f32;
@@ -20,10 +20,10 @@
             --tier-label-text: #fff;
             --icon-circle-border: #d1b4ff; 
             --active-mode-btn: #8e44ad; 
-            --hover-color: #2a2a4b; /* Hover sutil */
+            --hover-color: #2a2a4b; 
             --modal-bg: #1e1e3f; 
-            --combat-rank-bg: #3c3c6e; /* Fondo para el badge de rango */
-            --overall-box-bg: #141424; /* Fondo de la caja de posición */
+            --combat-rank-bg: #3c3c6e; 
+            --overall-box-bg: #141424; 
         }
 
         * {
@@ -45,7 +45,7 @@
             padding: 20px;
         }
         
-        /* --- Barra de Navegación (Header) --- */
+        /* --- Navbar --- */
         .navbar {
             background-color: var(--dark-panel-bg);
             padding: 10px 20px;
@@ -59,7 +59,7 @@
             font-size: 1.6em;
             font-weight: bold;
             color: var(--logo-color);
-            text-shadow: 0 0 5px rgba(209, 180, 255, 0.5); /* Fancy: Sombra sutil */
+            text-shadow: 0 0 5px rgba(209, 180, 255, 0.5); 
         }
 
         .nav-links { display: flex; gap: 20px; }
@@ -72,12 +72,9 @@
         }
         
         #discord-link { color: var(--logo-color); }
+        .nav-links a:hover { background-color: var(--dark-border); }
 
-        .nav-links a:hover {
-            background-color: var(--dark-border);
-        }
-
-        /* --- Selector de Modos (Barra de botones) --- */
+        /* --- Mode Bar (Selector de Modos) --- */
         .mode-bar {
             background-color: var(--dark-panel-bg);
             padding: 15px 20px;
@@ -95,7 +92,7 @@
             color: var(--main-text-color);
             border: none;
             padding: 10px 18px;
-            border-radius: 25px; /* Más redondeado, más fancy */
+            border-radius: 25px; 
             cursor: pointer;
             font-weight: 600;
             white-space: nowrap;
@@ -106,7 +103,6 @@
         }
         
         .mode-btn::before { font-size: 1.3em; line-height: 1; }
-        /* Iconos de modo */
         .overall-icon::before { content: '🏆'; }
         .sword-icon::before { content: '⚔️'; }
         .netpot-icon::before { content: '🧪'; }
@@ -115,7 +111,7 @@
 
         .mode-btn.active {
             background-color: var(--active-mode-btn); 
-            box-shadow: 0 0 15px rgba(142, 68, 173, 0.8); /* Sombra morada intensa */
+            box-shadow: 0 0 15px rgba(142, 68, 173, 0.8); 
             color: white;
         }
         
@@ -125,12 +121,13 @@
             margin-top: 20px;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); /* Sombra más profunda */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); 
             border: 1px solid var(--dark-border);
         }
 
         .tier-header, .tier-row {
             display: grid;
+            /* Columnas ajustadas para el nuevo formato */
             grid-template-columns: 50px 300px 80px 1fr; 
             padding: 15px 20px;
             align-items: center;
@@ -149,7 +146,7 @@
 
         .tier-row:hover {
             background-color: var(--hover-color);
-            transform: translateY(-2px); /* Efecto 3D sutil */
+            transform: translateY(-2px); 
         }
 
         /* Rank Badge Style */
@@ -158,7 +155,6 @@
             font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 10px;
         }
         
         .rank-number {
@@ -175,7 +171,16 @@
             border-radius: 4px;
             box-shadow: 0 0 8px var(--rank-gold);
         }
-        /* ... estilos rank 2 y 3 (omito por brevedad, se mantienen) */
+        .rank-2 .rank-number { 
+            background-color: var(--rank-silver); 
+            color: #333; 
+            border-radius: 4px;
+        }
+        .rank-3 .rank-number { 
+            background-color: var(--rank-bronze); 
+            color: #fff; 
+            border-radius: 4px;
+        }
         
         /* Estilos para el nombre de jugador */
         .player-info {
@@ -191,7 +196,7 @@
         }
         
         .player-name-line strong {
-            text-shadow: 0 0 3px var(--logo-color); /* Fancy: Glow en el nombre */
+            text-shadow: 0 0 3px var(--logo-color); 
         }
         
         .player-subtext {
@@ -206,40 +211,42 @@
             height: 36px; 
             border-radius: 50%; 
             border: 3px solid var(--logo-color); 
-            box-shadow: 0 0 5px rgba(209, 180, 255, 0.7); /* Fancy: Glow en el skin */
+            box-shadow: 0 0 5px rgba(209, 180, 255, 0.7); 
         }
 
-        /* Íconos de Tier */
-        .tiers-list {
+        /* --- Estilo del Solo Tier en la tabla --- */
+        .solo-tier-display {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px; /* Menos espacio, más compacto */
-            justify-content: flex-start; 
-        }
-
-        .tier-item-badge {
-            display: flex;
-            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
-            gap: 4px; 
         }
         
-        .icon-circle {
-            width: 40px; /* Tamaño un poco menor para compactar */
-            height: 40px;
-            border-radius: 50%;
-            background-color: #343460; 
-            border: 2px solid var(--icon-circle-border); 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; 
-            box-shadow: 0 0 5px rgba(209, 180, 255, 0.3); /* Fancy: Sombra ligera en el círculo */
+        .solo-tier-badge {
+            display: inline-block;
+            padding: 8px 15px; /* Más grande para destacar */
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         
-        /* ... estilos de imagen de cristal y tier labels (se mantienen) ... */
-
-        /* --- ESTILOS DEL MODAL DE PERFIL --- */
+        .tier-ht .solo-tier-label { 
+            background-color: var(--tier-high-color-bg); 
+            color: var(--tier-label-text); 
+        } 
+        .tier-lt .solo-tier-label { 
+            background-color: var(--tier-low-color-bg); 
+            color: var(--tier-label-text); 
+        }  
+        
+        /* Ocultar el label para solo-tier-display */
+        .solo-tier-badge .tier-label {
+            padding: 0;
+            background: none;
+        }
+        
+        /* --- Estilos del Modal de Perfil --- */
         .modal {
             display: none; 
             position: fixed;
@@ -257,9 +264,9 @@
         .modal-content {
             background-color: var(--modal-bg);
             padding: 30px 20px;
-            border-radius: 15px; /* Más redondeado */
+            border-radius: 15px; 
             width: 400px;
-            box-shadow: 0 5px 40px rgba(142, 68, 173, 0.9); /* Sombra del modal morada/fancy */
+            box-shadow: 0 5px 40px rgba(142, 68, 173, 0.9); 
             position: relative;
             text-align: center;
             border: 1px solid var(--logo-color);
@@ -278,18 +285,17 @@
         .close-btn:hover { color: white; }
         
         .modal-player-skin {
-            width: 120px; /* Más grande en el modal */
+            width: 120px; 
             height: 120px;
             border-radius: 50%;
-            border: 5px solid var(--rank-gold); /* Borde dorado destacado */
+            border: 5px solid var(--rank-gold); 
             margin-bottom: 20px;
             box-shadow: 0 0 15px var(--rank-gold);
         }
         
         .modal-player-name {
             font-size: 2.5em;
-            font-weight: 900; /* Más audaz */
-            /* Gradiente más dinámico */
+            font-weight: 900; 
             background: linear-gradient(45deg, var(--logo-color) 0%, #ffc107 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -332,8 +338,14 @@
             background-color: var(--rank-gold);
             padding: 10px 20px;
             border-radius: 8px;
-            transform: skewX(-5deg); /* Fancy: Efecto inclinado */
+            transform: skewX(-5deg); 
             min-width: 80px;
+        }
+        
+        .modal-overall-info {
+            text-align: left;
+            flex-grow: 1;
+            margin-left: 20px;
         }
         
         .modal-overall-title {
@@ -352,24 +364,19 @@
             margin-top: 5px;
         }
         
-        .modal-tiers-section h3 {
-             text-shadow: 0 0 5px rgba(209, 180, 255, 0.5);
-        }
-        
-        .modal-tiers-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
-            justify-content: center;
-        }
-        
-        /* Asegurarse de que los badges sean grandes en el modal */
-        .modal-tiers-list .icon-circle {
-            width: 50px;
-            height: 50px;
+        /* Nuevo estilo para Mejor Nivel en el modal */
+        .modal-solo-tier-section {
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #141424;
+            border: 1px solid var(--dark-border);
+            margin-top: 20px;
         }
 
+        .modal-solo-tier-label {
+            font-size: 1.8em;
+            font-weight: 900;
+        }
     </style>
 </head>
 <body>
@@ -388,7 +395,7 @@
     </div>
 
     <div class="container">
-        <h2>SA | Tier List (Overall)</h2>
+        <h2>SA | Tier List (Mejor Nivel)</h2>
 
         <div class="mode-bar">
             <button class="mode-btn overall-icon active" data-mode="Overall" id="btn-overall">Overall</button>
@@ -403,12 +410,12 @@
                 <div>#</div>
                 <div>Player</div>
                 <div>Region</div>
-                <div>Tiers</div>
+                <div>Mejor Nivel</div>
             </div>
 
             <div id="tier-list-body">
                 
-                <div class="tier-row" data-player-name="a2lqx" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="780" data-rank-overall="1" data-mode-tiers="CristalPvP:HT3,Sword:LT3,NetPot:LT2" data-region="SA">
+                <div class="tier-row" data-player-name="a2lqx" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="780" data-rank-overall="0" data-mode-tiers="CristalPvP:HT3,Sword:LT3,NetPot:LT2" data-region="SA">
                     <div class="rank-badge"><div class="rank-number"></div></div>
                     <div class="player-info">
                         <div class="player-name-line">
@@ -418,10 +425,10 @@
                         <div class="player-subtext">Combat Grandmaster (780 points)</div>
                     </div>
                     <div>SA</div>
-                    <div class="tiers-list"></div>
+                    <div class="solo-tier-display"></div>
                 </div>
 
-                <div class="tier-row" data-player-name="Svtylish" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="690" data-rank-overall="2" data-mode-tiers="SMP:LT4,NetPot:HT3,CristalPvP:HT4" data-region="SA">
+                <div class="tier-row" data-player-name="Svtylish" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="690" data-rank-overall="0" data-mode-tiers="SMP:LT4,NetPot:HT3,CristalPvP:HT4" data-region="SA">
                     <div class="rank-badge"><div class="rank-number"></div></div>
                     <div class="player-info">
                         <div class="player-name-line">
@@ -431,10 +438,10 @@
                         <div class="player-subtext">Combat Master (690 points)</div>
                     </div>
                     <div>SA</div>
-                    <div class="tiers-list"></div>
+                    <div class="solo-tier-display"></div>
                 </div>
 
-                <div class="tier-row" data-player-name="churrito" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="650" data-rank-overall="3" data-mode-tiers="CristalPvP:HT3,Sword:LT4,NetPot:LT4" data-region="SA">
+                <div class="tier-row" data-player-name="churrito" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="650" data-rank-overall="0" data-mode-tiers="CristalPvP:HT3,Sword:LT4,NetPot:LT4" data-region="SA">
                     <div class="rank-badge"><div class="rank-number"></div></div>
                     <div class="player-info">
                         <div class="player-name-line">
@@ -444,10 +451,10 @@
                         <div class="player-subtext">Combat Master (650 points)</div>
                     </div>
                     <div>SA</div>
-                    <div class="tiers-list"></div>
+                    <div class="solo-tier-display"></div>
                 </div>
                 
-                <div class="tier-row" data-player-name="Ax3loski" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="580" data-rank-overall="4" data-mode-tiers="Sword:LT3,NetPot:HT5,CristalPvP:HT5" data-region="SA">
+                <div class="tier-row" data-player-name="Ax3loski" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="580" data-rank-overall="0" data-mode-tiers="Sword:LT3,NetPot:HT5,CristalPvP:HT5" data-region="SA">
                     <div class="rank-badge"><div class="rank-number"></div></div>
                     <div class="player-info">
                         <div class="player-name-line">
@@ -457,10 +464,10 @@
                         <div class="player-subtext">Combat Expert (580 points)</div>
                     </div>
                     <div>SA</div>
-                    <div class="tiers-list"></div>
+                    <div class="solo-tier-display"></div>
                 </div>
 
-                <div class="tier-row" data-player-name="FracaSaurio" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="450" data-rank-overall="5" data-mode-tiers="CristalPvP:HT5,NetPot:HT4" data-region="SA">
+                <div class="tier-row" data-player-name="FracaSaurio" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="450" data-rank-overall="0" data-mode-tiers="CristalPvP:HT5,NetPot:HT4" data-region="SA">
                     <div class="rank-badge"><div class="rank-number"></div></div>
                     <div class="player-info">
                         <div class="player-name-line">
@@ -470,10 +477,10 @@
                         <div class="player-subtext">Combat Expert (450 points)</div>
                     </div>
                     <div>SA</div>
-                    <div class="tiers-list"></div>
+                    <div class="solo-tier-display"></div>
                 </div>
                 
-                <div class="tier-row" data-player-name="SoyDunca" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="420" data-rank-overall="6" data-mode-tiers="Sword:LT4,NetPot:HT4" data-region="SA">
+                <div class="tier-row" data-player-name="SoyDunca" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="420" data-rank-overall="0" data-mode-tiers="Sword:LT4,NetPot:HT4" data-region="SA">
                     <div class="rank-badge"><div class="rank-number"></div></div>
                     <div class="player-info">
                         <div class="player-name-line">
@@ -483,10 +490,10 @@
                         <div class="player-subtext">Combat Expert (420 points)</div>
                     </div>
                     <div>SA</div>
-                    <div class="tiers-list"></div>
+                    <div class="solo-tier-display"></div>
                 </div>
 
-                <div class="tier-row" data-player-name="Zencitop" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="350" data-rank-overall="7" data-mode-tiers="Sword:HT5,NetPot:LT4,CristalPvP:HT5" data-region="SA">
+                <div class="tier-row" data-player-name="Zencitop" data-skin-url="https://s.namemc.com/2d/skin/face.png?id=00000000000000000000000000000000&scale=6" data-points="350" data-rank-overall="0" data-mode-tiers="Sword:HT5,NetPot:LT4,CristalPvP:HT5" data-region="SA">
                     <div class="rank-badge"><div class="rank-number"></div></div>
                     <div class="player-info">
                         <div class="player-name-line">
@@ -496,7 +503,7 @@
                         <div class="player-subtext">Combat Expert (350 points)</div>
                     </div>
                     <div>SA</div>
-                    <div class="tiers-list"></div>
+                    <div class="solo-tier-display"></div>
                 </div>
                 
             </div> 
@@ -516,14 +523,14 @@
             <div class="modal-position-box">
                 <div id="modalRankNumber" class="modal-rank-number"></div>
                 <div class="modal-overall-info">
-                    <div class="modal-overall-title">🏆 OVERALL</div>
+                    <div class="modal-overall-title">🏆 POSICIÓN OVERALL</div>
                     <div id="modalOverallPoints" class="modal-overall-points"></div>
                 </div>
             </div>
 
-            <div class="modal-tiers-section">
-                <h3 style="color: var(--logo-color); padding-bottom: 5px; border-bottom: 1px solid var(--dark-border); margin-bottom: 10px;">TIERS</h3>
-                <div id="modalTiersList" class="modal-tiers-list">
+            <div class="modal-solo-tier-section">
+                <h3 style="color: var(--logo-color); margin-bottom: 10px;">MEJOR NIVEL</h3>
+                <div id="modalSoloTier" class="solo-tier-badge modal-solo-tier-label">
                     </div>
             </div>
         </div>
@@ -541,14 +548,6 @@
             'Overall': 2, 'Default': 1
         };
 
-        const MODE_ICONS = {
-            'Overall': { icon: '🏆', class: 'overall-icon-badge' },
-            'Sword': { icon: '⚔️', class: 'sword-icon-badge' }, 
-            'NetPot': { icon: '🧪', class: 'netpot-icon-badge' },
-            'CristalPvP': { icon: '💎', class: 'cristal-icon-badge', isImage: true, url: "https://media.discordapp.net/attachments/1446883353256132810/1446911128704782580/brave_screenshot_mctiers.com_8.png?ex=6935b47f&is=693462ff&hm=ce559901d610546fd8d22824e1b7c82d888530ce9946df337cb636f2acc88855&format=webp&quality=lossless" },
-            'SMP': { icon: '❤️', class: 'smp-icon-badge' },
-        };
-        
         function getTierScore(tierString) {
             return TIER_RANKING[tierString] || TIER_RANKING['Default'];
         }
@@ -569,26 +568,40 @@
             return '';
         }
 
-        function createTierBadge(modeName, tier) {
-            const iconData = MODE_ICONS[modeName] || { icon: '❓', class: '' };
+        /**
+         * Encuentra el string del Tier de mayor rango del jugador.
+         * @param {string} tiersData - String de tiers (ej: "CristalPvP:HT3,Sword:LT3").
+         * @returns {string} El string del mejor Tier (ej: "HT3").
+         */
+        function getSoloTier(tiersData) {
+            const tiers = tiersData.split(',').map(entry => {
+                const parts = entry.split(':');
+                return parts.length > 1 ? parts[1] : 'Default';
+            });
+
+            let bestTierString = 'Default';
+            let maxScore = 0;
+
+            tiers.forEach(tier => {
+                const score = getTierScore(tier);
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestTierString = tier;
+                }
+            });
+
+            return bestTierString;
+        }
+
+        function createSoloTierBadge(tier) {
             const tierClass = getTierClass(tier);
 
             const item = document.createElement('div');
-            item.className = `tier-item-badge ${tierClass}`;
-            item.setAttribute('data-mode-name', modeName);
+            // Usamos la clase tier-ht o tier-lt y la nueva clase solo-tier-badge
+            item.className = `solo-tier-badge ${tierClass}`;
             
-            let iconHTML;
-            if (iconData.isImage && iconData.url) {
-                // Para las imágenes (como CristalPvP)
-                iconHTML = `<img src="${iconData.url}" alt="${modeName} Icon" class="cristal-pvp-img">`;
-            } else {
-                // Para los emojis
-                iconHTML = `<span class="mode-icon ${iconData.class}">${iconData.icon}</span>`;
-            }
-
             item.innerHTML = `
-                <div class="icon-circle">${iconHTML}</div>
-                <span class="tier-label">${tier}</span>
+                <span class="solo-tier-label tier-label">${tier}</span>
             `;
             return item;
         }
@@ -596,7 +609,6 @@
         // --- LÓGICA DE FILTRADO Y ORDENAMIENTO ---
         const tierListBody = document.getElementById('tier-list-body');
         const modeButtons = document.querySelectorAll('.mode-btn');
-        const tierRows = document.querySelectorAll('.tier-row');
         const rankingsLink = document.getElementById('rankings-link');
 
         function getPlayerScoreInMode(row, mode) {
@@ -604,19 +616,8 @@
             const tiers = tiersData.split(',');
             
             if (mode === 'Overall') {
-                // Para Overall, se ordena por el MEJOR Tier (mayor TIER_RANKING) que tenga el jugador.
-                let maxScore = 0;
-                tiers.forEach(tierEntry => {
-                    const parts = tierEntry.split(':');
-                    if (parts.length > 1) {
-                         const tier = parts[1];
-                         const score = getTierScore(tier);
-                         if (score > maxScore) {
-                             maxScore = score;
-                         }
-                    }
-                });
-                return maxScore;
+                // Para Overall, se ordena por el MEJOR Tier que tenga el jugador (Solo Tier Score).
+                return getTierScore(getSoloTier(tiersData));
             } else {
                 // Para un modo específico, se ordena por el Tier de ese modo.
                 for (const tierEntry of tiers) {
@@ -628,43 +629,11 @@
                 return 0; // Si no tiene Tier en este modo
             }
         }
-        
-        function updateRowTiers(row, selectedMode) {
-            const tiersData = row.getAttribute('data-mode-tiers');
-            const tiersListDiv = row.querySelector('.tiers-list');
-            tiersListDiv.innerHTML = ''; 
-
-            if (selectedMode !== 'Overall') {
-                // Muestra solo el tier de la modalidad activa
-                const tiers = tiersData.split(',');
-                const modeEntry = tiers.find(e => e.includes(selectedMode));
-                if (modeEntry) {
-                    const [modeName, tier] = modeEntry.split(':');
-                    if (tier && getTierScore(tier) > 0) {
-                         tiersListDiv.appendChild(createTierBadge(modeName, tier));
-                    }
-                }
-            } else {
-                // Muestra todos los tiers, ordenados por score (mejor primero)
-                const tiers = tiersData.split(',').map(entry => {
-                    const [modeName, tier] = entry.split(':');
-                    return { modeName, tier: tier || 'Default', score: getTierScore(tier) };
-                });
-
-                const relevantTiers = tiers
-                    .filter(e => e.score > 0)
-                    .sort((a, b) => b.score - a.score); 
-
-                relevantTiers.forEach(entry => {
-                    tiersListDiv.appendChild(createTierBadge(entry.modeName, entry.tier));
-                });
-            }
-        }
 
         function filterAndSort(selectedMode) {
             
+            // 1. Manejo de botones activos
             modeButtons.forEach(btn => btn.classList.remove('active'));
-            // Usamos un querySelectorAll para mayor robustez
             const activeBtn = document.querySelector(`[data-mode="${selectedMode}"]`);
             if (activeBtn) {
                  activeBtn.classList.add('active');
@@ -672,29 +641,40 @@
 
             let activeRows = [];
             
-            // Recorre todas las filas para calcular el score y la relevancia
+            // 2. Recorre filas, calcula score y determina relevancia
             document.querySelectorAll('.tier-row').forEach(row => {
                 const tiersData = row.getAttribute('data-mode-tiers');
-                // Considera relevante si tiene algún tier en el modo seleccionado o si es Overall.
-                const hasTierInMode = tiersData.includes(selectedMode) || selectedMode === 'Overall';
+                const score = getPlayerScoreInMode(row, selectedMode);
 
-                if (hasTierInMode) {
+                // Relevancia: tiene un score en el modo > 0 (o si es Overall y tiene score > 0)
+                const isRelevant = score > 1; 
+
+                if (isRelevant) {
                     row.classList.remove('hidden');
                     activeRows.push({
                         element: row,
-                        score: getPlayerScoreInMode(row, selectedMode)
+                        score: score
                     });
                 } else {
                     row.classList.add('hidden');
                 }
                 
-                // Actualizar la visualización de tiers en la fila
-                updateRowTiers(row, selectedMode);
+                // --- 3. Actualización del Solo Tier en la Fila ---
+                const soloTierDisplayDiv = row.querySelector('.solo-tier-display');
+                soloTierDisplayDiv.innerHTML = '';
+                
+                const soloTier = getSoloTier(tiersData);
+                
+                // Mostrar el Solo Tier si el jugador tiene algún Tier relevante
+                if (getTierScore(soloTier) > 1) { 
+                     soloTierDisplayDiv.appendChild(createSoloTierBadge(soloTier));
+                }
             });
 
-            // Ordena de forma descendente (el score más alto va primero)
+            // 4. Ordenamiento
             activeRows.sort((a, b) => b.score - a.score);
 
+            // 5. Visualización y asignación de rangos
             let currentRank = 1;
             activeRows.forEach(item => {
                 const row = item.element;
@@ -713,7 +693,7 @@
                 currentRank++;
             });
             
-            document.querySelector('h2').textContent = `SA | Tier List (${selectedMode})`;
+            document.querySelector('h2').textContent = `SA | Tier List (${selectedMode === 'Overall' ? 'Mejor Nivel' : selectedMode})`;
         }
         
         // --- Event Listeners ---
@@ -728,7 +708,6 @@
         rankingsLink.addEventListener('click', (e) => {
             e.preventDefault();
             filterAndSort('Overall');
-            // Nota: Se omite el alert para un comportamiento más limpio en la web.
         });
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -740,11 +719,13 @@
                 row.addEventListener('click', () => {
                     const playerName = row.getAttribute('data-player-name');
                     const skinUrl = row.getAttribute('data-skin-url');
-                    const region = row.getAttribute('data-region') || 'SA'; // Usa el atributo data-region
+                    const region = row.getAttribute('data-region') || 'SA';
                     const tiersData = row.getAttribute('data-mode-tiers');
                     const rankNumber = row.getAttribute('data-rank-overall');
                     const points = row.getAttribute('data-points');
                     const combatRank = getCombatRank(points);
+                    
+                    const soloTier = getSoloTier(tiersData);
                     
                     document.getElementById('modalSkin').src = skinUrl;
                     document.getElementById('modalPlayerName').textContent = playerName;
@@ -753,22 +734,10 @@
                     document.getElementById('modalRankNumber').textContent = `${rankNumber}.`;
                     document.getElementById('modalOverallPoints').textContent = `(${points} points)`;
                     
-                    const modalTiersList = document.getElementById('modalTiersList');
-                    modalTiersList.innerHTML = '';
-                    
-                    // Mostrar todos los Tiers en el modal (siempre todos los tiers, ordenados)
-                    const tiers = tiersData.split(',').map(entry => {
-                        const [modeName, tier] = entry.split(':');
-                        return { modeName, tier: tier || 'Default', score: getTierScore(tier) };
-                    });
-                    
-                    const relevantTiers = tiers
-                        .filter(e => e.score > 0)
-                        .sort((a, b) => b.score - a.score); 
-
-                    relevantTiers.forEach(entry => {
-                        modalTiersList.appendChild(createTierBadge(entry.modeName, entry.tier));
-                    });
+                    const modalSoloTierDiv = document.getElementById('modalSoloTier');
+                    modalSoloTierDiv.innerHTML = ''; // Limpiar
+                    modalSoloTierDiv.className = `solo-tier-badge modal-solo-tier-label ${getTierClass(soloTier)}`;
+                    modalSoloTierDiv.textContent = soloTier;
                     
                     document.getElementById('playerModal').style.display = 'flex';
                 });
