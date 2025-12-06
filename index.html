@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💜 ZenMC Tiers - SA Rankings Dinámicos</title>
+    <style>
+        /* Variables y Estilos Generales */
+        :root {
+            --bg-color: #1a1a2e; /* Morado Oscuro/Casi Negro */
+            --main-text-color: #f0f0f0;
+            --dark-panel-bg: #2b2b4d; /* Morado Medio */
+            --dark-border: #444473; /* Morado Grisáceo para bordes */
+            --logo-color: #d1b4ff; /* Morado Claro/Lila para el logo */
+            --rank-gold: #ffc107; /* Mantenemos el oro para el #1 */
+            --tier-high-color-bg: #b03a8d; /* Morado/Rojo Oscuro para HT */
+            --tier-low-color-bg: #8e44ad;  /* Morado Intenso para LT */
+            --tier-label-text: #fff;
+            --icon-circle-border: #d1b4ff; /* Borde de ícono lila */
+            --active-mode-btn: #8e44ad; /* Morado de botón activo */
+
+            /* Colores Modal (Simulando el Screenshot) */
+            --modal-bg: #1c1c2e; 
+            --modal-dark-text: #5a5a7d; /* Gris morado suave */
+            --modal-name-color: #8e44ad; /* Morado para el nombre */
+            --badge-combat: #ffc107;
+            --overall-bg: #ffc107; /* Fondo Oro */
+            --overall-text: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--main-text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* --- Barra de Navegación (Header) --- */
+        .navbar {
+            background-color: var(--dark-panel-bg);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--dark-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--logo-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--main-text-color);
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        #discord-link {
+            color: #d1b4ff; /* Lila */
+        }
+
+        .nav-links a:hover {
+            background-color: #444473;
+        }
+
+
+        /* --- Selector de Modos (Barra de botones) --- */
+        .mode-bar {
+            background-color: var(--dark-panel-bg);
+            padding: 15px 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            justify-content: flex-start;
+        }
+
+        .mode-btn {
+            background-color: #3b3b6b;
+            color: var(--main-text-color);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Estilos de Íconos para la barra de botones */
+        .mode-btn::before { font-size: 1.2em; line-height: 1; }
+        .overall-icon::before { content: '🏆'; }
+        .sword-icon::before { content: '⚔️'; }
+        .netpot-icon::before { content: '🧪'; }
+        .cristal-icon::before { content: '💎'; }
+        .uhc-icon::before { content: '🍎'; }
+        .smp-icon::before { content: '❤️'; }
+
+
+        .mode-btn.active {
+            background-color: var(--active-mode-btn); 
+            box-shadow: 0 0 10px rgba(142, 68, 173, 0.5); 
+        }
+
+        /* --- Tabla de la Tier List --- */
+        .tier-table {
+            background-color: var(--dark-panel-bg);
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .tier-header, .tier-row {
+            display: grid;
+            /* Ajuste de columnas */
+            grid-template-columns: 50px 180px 80px 1fr; 
+            padding: 12px 20px;
+            align-items: center;
+            border-bottom: 1px solid var(--dark-border);
+            transition: background-color 0.2s;
+        }
+        
+        .tier-row.hidden { display: none; }
+
+        .tier-header {
+            background-color: #3b3b6b;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            color: #ccc;
+        }
+
+        .tier-row:hover { background-color: #343460; }
+
+        /* Rank Badge Style */
+        .rank-badge {
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Colores de Top Ranks */
+        .rank-number {
+            font-weight: 700;
+            padding: 2px 4px;
+            min-width: 20px;
+            text-align: center;
+            display: inline-block;
+        }
+        .rank-1 .rank-number { 
+            background-color: var(--rank-gold); 
+            color: #333; 
+            border-radius: 4px;
+        }
+        .rank-2 .rank-number { 
+            background-color: #a0a0a0; 
+            color: #333; 
+            border-radius: 4px;
+        }
+        .rank-3 .rank-number { 
+            background-color: #cd7f32; 
+            color: #fff; 
+            border-radius: 4px;
+        }
+        
+        /* Estilos para el nombre de jugador y el clic */
+        .player-info {
+            display: flex;
+            align-items: center; 
+            gap: 8px; 
+            cursor: pointer; 
+            transition: color 0.2s;
+        }
+        .player-info:hover strong {
+            color: var(--logo-color);
+        }
+        
+        .skin-icon {
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            border: 2px solid var(--main-text-color); 
+        }
+
+        /* Íconos de Tier en la Tabla */
+        .tiers-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px; 
+            justify-content: flex-start; 
+        }
+
+        .tier-item-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            text-align: center;
+        }
+        
+        .icon-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #343460; 
+            border: 2px solid var(--icon-circle-border); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; 
+        }
+
+        .mode-icon { font-size: 1.1em; line-height: 1; }
+        
+        /* Iconografía para Tiers */
+        .cristal-pvp-img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; display: block; }
+        .tier-item-badge[data-mode-name="CristalPvP"] .icon-circle { border: none; background-color: #222; }
+        .netpot-icon-badge { color: #f06292; } 
+        .sword-icon-badge { color: #9fa8da; } 
+        .smp-icon-badge { color: #e57373; } 
+        .uhc-icon-badge { color: #fbc02d; } 
+        .overall-icon-badge { color: #fff176; } 
+
+        .tier-label {
+            font-size: 0.6em;
+            font-weight: bold;
+            padding: 1px 3px;
+            border-radius: 3px;
+            color: var(--tier-label-text); 
+        }
+        
+        .tier-ht .tier-label { background-color: var(--tier-high-color-bg); }
+        .tier-lt .tier-label { background-color: var(--tier-low-color-bg); }
+
+
+        /* ================================================= */
+        /* --- ESTILOS DEL MODAL DE PERFIL (SCREENSHOT) --- */
+        /* ================================================= */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 350px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+            position: relative;
+            text-align: center;
+            border: 1px solid var(--dark-border);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2em;
+            color: var(--modal-dark-text);
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .profile-head {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            border: 4px solid var(--modal-dark-text);
+            margin-bottom: 10px;
+        }
+
+        #profile-name {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--modal-name-color);
+            margin-bottom: 5px;
+        }
+        
+        #profile-region, #profile-points-label {
+            color: var(--modal-dark-text);
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .combat-badge {
+            background-color: #333;
+            color: var(--badge-combat);
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin: 10px auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .combat-badge::before { content: '🏆'; font-size: 1.1em; }
+
+
+        .overall-rank-box {
+            background-color: var(--dark-panel-bg);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid var(--dark-border);
+        }
+
+        .overall-rank-number {
+            background-color: var(--overall-bg);
+            color: var(--overall-text);
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .overall-rank-text {
+            text-align: left;
+            font-weight: 600;
+        }
+        .overall-rank-text .points {
+            font-weight: normal;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        #profile-tiers-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        /* Reutilizamos los estilos de tier-item-badge para el modal, pero aumentamos el tamaño */
+        .profile-tier-item {
+             display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px; 
+        }
+        .profile-tier-item .icon-circle {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--icon-circle-border);
+        }
+        .profile-tier-item .mode-icon { font-size: 1.8em; }
+        .profile-tier-item .tier-label { font-size: 0.8em; padding: 3px 6px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">ZENMC TIERS 💜</div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#" id="rankings-link">Rankings (Mejor Nivel)</a>
+            <a href="https://ejemplo.com/discord-link" target="_blank" id="discord-link">Discord</a>
+            <a href="#">Docs</a>
+        </div>
+        <div>
+            <input type="search" id="searchInput" placeholder="Search player..." style="padding: 5px; border-radius: 3px; border: 1px solid #333; background: #333; color: white;">
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <h2>SA | Tier List (Overall)</h2>
+
+        <div class="mode-bar">
+            <button class="mode-btn overall-icon active" data-mode="Overall">Overall</button>
+            <button class="mode-btn sword-icon" data-mode="Sword">Sword</button>
+            <button class="mode-btn netpot-icon" data-mode="NetPot">NetPot</button>
+            <button class="mode-btn cristal-icon" data-mode="CristalPvP">CristalPvP</button>
+            <button class="mode-btn uhc-icon" data-mode="UHC">UHC</button>
+            <button class="mode-btn smp-icon" data-mode="SMP">SMP</button>
+        </div>
+
+        <div class="tier-table">
+            
+            <div class="tier-header">
+                <div>#</div>
+                <div>Player</div>
+                <div>Region</div>
+                <div>Tiers</div>
+            </div>
+
+            <div id="tier-list-body">
+                
+                <div class="tier-row" data-name="a2lqx" data-skin-name="a2lqx" data-mode-tiers="CristalPvP:HT3,Sword:LT5,NetPot:LT5,UHC:LT5,SMP:LT5">
+                    <div class="rank-badge"><div class="rank-number"></div></div>
+                    <div class="player-info" data-player="a2lqx">
+                        <img src="https://cravatar.eu/helmavatar/a2lqx/36.png" alt="Skin Icon a2lqx" class="skin-icon">
+                        <strong>a2lqx</strong>
+                    </div>
+                    <div>SA</div>
+                    <div class="tiers-list"></div>
+                </div>
+
+                <div class="tier-row" data-name="Axel0ski" data-skin-name="Axel0ski" data-mode-tiers="Sword:LT3,NetPot:HT5,UHC:LT4,CristalPvP:LT5,SMP:LT5">
+                    <div class="rank-badge"><div class="rank-number"></div></div>
+                    <div class="player-info" data-player="Axel0ski">
+                        <img src="https://cravatar.eu/helmavatar/Axel0ski/36.png" alt="Skin Icon Axel0ski" class="skin-icon">
+                        <strong>Axel0ski</strong>
+                    </div>
+                    <div>SA</div>
+                    <div class="tiers-list"></div>
+                </div>
+
+                <div class="tier-row" data-name="Coco_elmo" data-skin-name="Coco_elmo" data-mode-tiers="CristalPvP:HT4,Sword:LT5,NetPot:LT5,UHC:LT5,SMP:LT5">
+                    <div class="rank-badge"><div class="rank-number"></div></div>
+                    <div class="player-info" data-player="Coco_elmo">
+                        <img src="https://cravatar.eu/helmavatar/Coco_elmo/36.png" alt="Skin Icon Coco_elmo" class="skin-icon">
+                        <strong>Coco_elmo</strong>
+                    </div>
+                    <div>SA</div>
+                    <div class="tiers-list"></div>
+                </div>
+
+                <div class="tier-row" data-name="FracaSaurio" data-skin-name="FracaSaurio" data-mode-tiers="NetPot:HT4,CristalPvP:LT5,Sword:LT5,UHC:LT5,SMP:LT5">
+                    <div class="rank-badge"><div class="rank-number"></div></div>
+                    <div class="player-info" data-player="FracaSaurio">
+                        <img src="https://cravatar.eu/helmavatar/FracaSaurio/36.png" alt="Skin Icon FracaSaurio" class="skin-icon">
+                        <strong>FracaSaurio</strong>
+                    </div>
+                    <div>SA</div>
+                    <div class="tiers-list"></div>
+                </div>
+
+                <div class="tier-row" data-name="Soydieguitoz" data-skin-name="Soydieguitoz" data-mode-tiers="CristalPvP:LT4,SMP:HT4,Sword:LT4,NetPot:HT3,UHC:LT5">
+                    <div class="rank-badge"><div class="rank-number"></div></div>
+                    <div class="player-info" data-player="Soydieguitoz">
+                        <img src="https://cravatar.eu/helmavatar/Soydieguitoz/36.png" alt="Skin Icon Soydieguitoz" class="skin-icon">
+                        <strong>Soydieguitoz</strong>
+                    </div>
+                    <div>SA</div>
+                    <div class="tiers-list"></div>
+                </div>
+                
+                <div class="tier-row" data-name="Zencitop" data-skin-name="Zencitop" data-mode-tiers="Sword:HT5,NetPot:HT4,UHC:HT4,CristalPvP:LT5,SMP:LT5">
+                    <div class="rank-badge"><div class="rank-number"></div></div>
+                    <div class="player-info" data-player="Zencitop">
+                        <img src="https://cravatar.eu/helmavatar/Zencitop/36.png" alt="Skin Icon Zencitop" class="skin-icon">
+                        <strong>Zencitop</strong>
+                    </div>
+                    <div>SA</div>
+                    <div class="tiers-list"></div>
+                </div>
+                
+            </div> 
+        </div>
+        
+    </div>
+    
+    <div id="player-profile-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal-btn">&times;</span>
+            <img id="profile-head" class="profile-head" alt="Player Head">
+            <h3 id="profile-name"></h3>
+            <div class="combat-badge">Combat Grandmaster</div>
+            <div id="profile-region">South America</div>
+            
+            <a href="#" id="namemc-link" style="color: #777; font-size: 0.8em; margin: 5px 0 20px 0; display: block;">NameMC 🔗</a>
+
+            <div class="overall-rank-box">
+                <div class="overall-rank-number">
+                    <span id="profile-overall-rank">1.</span>
+                    <span class="overall-trophy">🏆</span>
+                </div>
+                <div class="overall-rank-text">
+                    OVERALL
+                    <div class="points" id="profile-overall-points"></div>
+                </div>
+            </div>
+
+            <h4 id="profile-points-label">TIERS</h4>
+            
+            <div id="profile-tiers-container">
+                </div>
+            
+        </div>
+    </div>
+
+
+    <script>
+        // PUNTUACIÓN DE TIERS: LT5=10, HT1=100 (Escalado de 10 en 10)
+        const TIER_SCORES = {
+            'HT1': 100, 'LT1': 90,
+            'HT2': 80, 'LT2': 70,
+            'HT3': 60, 'LT3': 50,
+            'HT4': 40, 'LT4': 30,
+            'HT5': 20, 'LT5': 10,
+            'NA': 0, // No rank in this mode
+        };
+
+        const MODE_ICONS = {
+            'Overall': { icon: '⭐', class: 'overall-icon-badge' },
+            'Sword': { icon: '🗡️', class: 'sword-icon-badge' },
+            'NetPot': { icon: '🧪', class: 'netpot-icon-badge' },
+            'CristalPvP': { icon: '💎', class: 'cristal-icon-badge', isImage: true }, 
+            'UHC': { icon: '🍎', class: 'uhc-icon-badge' },
+            'SMP': { icon: '❤️', class: 'smp-icon-badge' },
+        };
+        
+        const tierListBody = document.getElementById('tier-list-body');
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        const tierRows = document.querySelectorAll('.tier-row');
+        
+        // Modal elements
+        const modal = document.getElementById('player-profile-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const profileHead = document.getElementById('profile-head');
+        const profileName = document.getElementById('profile-name');
+        const profileRegion = document.getElementById('profile-region');
+        const profileOverallRank = document.getElementById('profile-overall-rank');
+        const profileOverallPoints = document.getElementById('profile-overall-points');
+        const profileTiersContainer = document.getElementById('profile-tiers-container');
+        const namemcLink = document.getElementById('namemc-link');
+
+        function getTierScore(tierString) {
+            return TIER_SCORES[tierString] || TIER_SCORES['NA'];
+        }
+
+        function parseTiersData(row) {
+            const tiersData = row.getAttribute('data-mode-tiers');
+            return tiersData.split(',').map(entry => {
+                const [modeName, tier] = entry.split(':');
+                return { modeName, tier: tier || 'NA', score: getTierScore(tier) };
+            });
+        }
+
+        // Retorna el puntaje total y el puntaje del tier más alto
+        function getOverallData(tiers) {
+            let totalScore = 0;
+            let maxScore = 0;
+            tiers.forEach(entry => {
+                totalScore += entry.score;
+                if (entry.score > maxScore) {
+                    maxScore = entry.score;
+                }
+            });
+            return { totalScore, maxScore };
+        }
+
+        function getTierClass(tier) {
+            const prefix = tier.substring(0, 2);
+            if (prefix === 'HT') return 'tier-ht';
+            if (prefix === 'LT') return 'tier-lt';
+            return '';
+        }
+        
+        // --- 1. Lógica de Ordenamiento y Visualización en la Tabla ---
+        function filterAndSort(selectedMode) {
+            
+            modeButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-mode="${selectedMode}"]`).classList.add('active');
+            document.querySelector('h2').textContent = `SA | Tier List (${selectedMode})`;
+
+            let activeRows = [];
+
+            tierRows.forEach(row => {
+                const tiersData = parseTiersData(row);
+                let score, totalScore, maxScore;
+                
+                if (selectedMode === 'Overall') {
+                    const overallData = getOverallData(tiersData);
+                    score = overallData.maxScore; // Score primario para Overall es el max tier score
+                    totalScore = overallData.totalScore;
+                } else {
+                    const modeEntry = tiersData.find(e => e.modeName === selectedMode);
+                    score = modeEntry ? modeEntry.score : 0;
+                }
+                
+                row.classList.remove('hidden');
+                activeRows.push({ 
+                    element: row, 
+                    score: score,
+                    totalScore: totalScore,
+                    tiersData: tiersData // Guardar los datos completos para el modal
+                });
+                
+                // Actualizar la lista de tiers en la fila
+                const tiersListDiv = row.querySelector('.tiers-list');
+                tiersListDiv.innerHTML = ''; 
+                
+                if (selectedMode !== 'Overall') {
+                    const entry = tiersData.find(e => e.modeName === selectedMode);
+                    if (entry && entry.tier !== 'NA' && entry.score > 0) {
+                         tiersListDiv.appendChild(createTierBadge(entry.modeName, entry.tier, false));
+                    }
+                } else {
+                    // Ordenar por score descendente y mostrar máximo 3 para 'Overall'
+                    const relevantTiers = tiersData
+                        .filter(e => e.score > 0)
+                        .sort((a, b) => b.score - a.score)
+                        .slice(0, 3); 
+
+                    relevantTiers.forEach(entry => {
+                        tiersListDiv.appendChild(createTierBadge(entry.modeName, entry.tier, false));
+                    });
+                }
+            });
+
+            // Lógica de Ordenamiento
+            activeRows.sort((a, b) => {
+                if (selectedMode === 'Overall') {
+                    // 1. Primario: Max Tier Score (Max Score)
+                    if (b.score !== a.score) {
+                        return b.score - a.score;
+                    }
+                    // 2. Secundario: Total Score (Puntos totales)
+                    if (b.totalScore !== a.totalScore) {
+                        return b.totalScore - a.totalScore;
+                    }
+                } else {
+                    // Modo específico: Solo por score en esa modalidad
+                    if (b.score !== a.score) {
+                        return b.score - a.score;
+                    }
+                }
+                
+                // 3. Terciario: Alfabético por nombre (para desempate final)
+                const nameA = a.element.getAttribute('data-name').toLowerCase();
+                const nameB = b.element.getAttribute('data-name').toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+
+            let currentRank = 1;
+            activeRows.forEach(item => {
+                const row = item.element;
+                
+                let rankVisualElement = row.querySelector('.rank-number');
+                rankVisualElement.textContent = currentRank;
+                
+                row.classList.remove('rank-1', 'rank-2', 'rank-3');
+                if (currentRank === 1) row.classList.add('rank-1');
+                if (currentRank === 2) row.classList.add('rank-2');
+                if (currentRank === 3) row.classList.add('rank-3');
+                
+                tierListBody.appendChild(row);
+                currentRank++;
+            });
+        }
+        
+        // Crea el HTML para un badge de Tier
+        function createTierBadge(modeName, tier, isProfile = false) {
+            const containerClass = isProfile ? 'profile-tier-item' : 'tier-item-badge';
+            const iconData = MODE_ICONS[modeName] || { icon: '❓', class: '' };
+            const tierClass = getTierClass(tier);
+
+            const item = document.createElement('div');
+            item.className = `${containerClass} ${tierClass}`;
+            item.setAttribute('data-mode-name', modeName);
+            
+            let iconHTML;
+            if (modeName === 'CristalPvP' && iconData.isImage) {
+                // Usar imagen específica para CristalPvP (simulando el screenshot)
+                const imageUrl = "https://media.discordapp.net/attachments/1446883353256132810/1446911128704782580/brave_screenshot_mctiers.com_8.png?ex=6935b47f&is=693462ff&hm=ce559901d610546fd8d22824e1b7c82d888530ce9946df337cb636f2acc88855&format=webp&quality=lossless";
+                 iconHTML = `<img src="${imageUrl}" alt="${modeName} Icon" class="cristal-pvp-img">`;
+            } else {
+                iconHTML = `<span class="mode-icon ${iconData.class}">${iconData.icon}</span>`;
+            }
+
+            item.innerHTML = `
+                <div class="icon-circle">${iconHTML}</div>
+                <span class="tier-label">${tier}</span>
+            `;
+            return item;
+        }
+
+
+        // --- 2. Lógica del Modal ---
+        function openProfileModal(playerRow) {
+            const playerName = playerRow.getAttribute('data-name');
+            const skinName = playerRow.getAttribute('data-skin-name');
+            const tiers = parseTiersData(playerRow);
+            const overallData = getOverallData(tiers);
+            const overallRank = playerRow.querySelector('.rank-number').textContent;
+            
+            profileHead.src = `https://cravatar.eu/helmavatar/${skinName}/128.png`;
+            profileName.textContent = playerName;
+            profileRegion.textContent = 'South America'; // Asumido
+            
+            profileOverallRank.textContent = `${overallRank}.`;
+            profileOverallPoints.textContent = `(${overallData.totalScore} points)`;
+            
+            // Llenar los tiers
+            profileTiersContainer.innerHTML = '';
+            
+            const allModes = Object.keys(MODE_ICONS);
+            
+            allModes.forEach(modeName => {
+                const entry = tiers.find(t => t.modeName === modeName);
+                const tier = entry ? entry.tier : 'NA';
+                
+                // Mostrar solo tiers con score > 0
+                if (tier !== 'NA' && TIER_SCORES[tier] > 0) {
+                     profileTiersContainer.appendChild(createTierBadge(modeName, tier, true));
+                }
+            });
+
+            // Enlace NameMC
+            namemcLink.href = `https://namemc.com/profile/${skinName}`;
+            
+            modal.style.display = 'flex';
+        }
+
+        // --- Event Listeners ---
+        
+        // Botones de Modalidad
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const mode = button.getAttribute('data-mode');
+                filterAndSort(mode);
+            });
+        });
+        
+        // Abrir Modal al hacer clic en el nombre del jugador
+        tierListBody.addEventListener('click', (e) => {
+            const playerInfoDiv = e.target.closest('.player-info');
+            if (playerInfoDiv) {
+                const row = playerInfoDiv.closest('.tier-row');
+                openProfileModal(row);
+            }
+        });
+
+        // Cerrar Modal
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+        
+        // Buscar jugador
+        document.getElementById('searchInput').addEventListener('keyup', (e) => {
+            const term = e.target.value.toLowerCase();
+            const currentModeBtn = document.querySelector('.mode-btn.active');
+            const currentMode = currentModeBtn ? currentModeBtn.getAttribute('data-mode') : 'Overall';
+
+            tierRows.forEach(row => {
+                const playerName = row.getAttribute('data-name').toLowerCase();
+                if (playerName.includes(term)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Re-ordenar y re-rankear a los jugadores visibles
+            filterAndSort(currentMode);
+        });
+        
+        // Inicializar al cargar con el modo 'Overall'
+        document.addEventListener('DOMContentLoaded', () => {
+            filterAndSort('Overall');
+        });
+        
+    </script>
+</body>
+</html>
